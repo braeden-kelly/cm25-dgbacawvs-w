@@ -1,0 +1,24 @@
+services:
+  db:
+    image: ankane/pgvector
+    container_name: pgvector
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:  
+      - POSTGRES_DB=meal_planner
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=codemash2025
+    volumes:
+     - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    restart: always
+    ports: 
+      - "8888:80"
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: "user@pgadmin.com"
+      PGADMIN_DEFAULT_PASSWORD: "pgadmin"
+    depends_on: 
+      - db   

@@ -33,6 +33,26 @@ Follow installation instructions on pip's website (https://pip.pypa.io/en/stable
 
 `python3 -m pip install --upgrade pip`
 
+## Start dependencies (postgres, pgadmin, etc.)
+`docker-compose up -d`
+
+To stop and remove containers:
+`docker-compose down`
+
+## Log into pgadmin
+* Go to http://localhost:8888
+* Enter username: user@pgadmin.com and password: pgadmin
+
+## Connect to database in pgadmin
+* Servers > Add New Servers
+* General tab
+    * Name: pgvector
+* Connection tab
+    * Hostname: host.docker.internal
+    * Port: 5434
+    * Username: postgres
+    * Password: codemash2025!
+
 ## Setup environment variables
 Copy the file 'sample.env' and rename it to '.env'.  Add your API keys.
 
