@@ -4,6 +4,8 @@
 * OpenAI API key
 * Langchain API key (to use LangSmith for debugging)
 
+## Setup environment variables
+Copy the file 'sample.env' and rename it to '.env'.  Add your API keys.
 
 ## Create and activate a virtual environment
 Create a virtual environment to install dependencies only in this project and not globally
@@ -28,10 +30,11 @@ If you're running Python 3.4+ you should already have pip installed. To check if
 
 Follow installation instructions on pip's website (https://pip.pypa.io/en/stable/installation/#installation)
 
-
 ### Upgrade pip:
-
 `python3 -m pip install --upgrade pip`
+
+## Install packages
+`python3 -m pip install -r requirements.txt`
 
 ## Start dependencies (postgres, pgadmin, etc.)
 `docker-compose up -d`
@@ -52,12 +55,6 @@ To stop and remove containers:
     * Port: 5434
     * Username: postgres
     * Password: codemash2025!
-
-## Setup environment variables
-Copy the file 'sample.env' and rename it to '.env'.  Add your API keys.
-
-## Install packages
-`python3 -m pip install -r requirements.txt`
 
 ## Run application
 `python3 main.py`
