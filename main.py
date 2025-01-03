@@ -3,7 +3,7 @@ from langchain_openai import ChatOpenAI
 from langchain_community.document_loaders import CSVLoader
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai.embeddings import OpenAIEmbeddings
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.messages import HumanMessage
 
@@ -38,6 +38,9 @@ def get_response(input):
     # indicates to the LLM what task to perform and the context to use (relevant recipes retrieved from our list)
     system_template = """
         You are a a helpful meal planner. Your job is to suggest meals based on the user's questions and the context below. 
+        If the user requests a meal type you're not familiar with, first obtain information about the meal type, then suggest meals.
+
+        Respond only with recipes included in the context; do not add recipes from other sources.
         
         If the user's question has nothing to do with recipes, meals, or food, then reply 'Sorry, I don't have the information requested.'
         
