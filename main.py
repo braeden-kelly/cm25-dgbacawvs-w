@@ -8,53 +8,45 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.messages import HumanMessage
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 
+# Create an OpenAI chat model
+def initialize_llm():
+    return ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 
-# load environment variables
-env_found = load_dotenv(override=True, verbose=True)
-
-def get_response(input, chat_history):
-
-    # Parse CSV file with recipes into documents
+# Parse CSV file with recipes into a list of documents that can be loaded into a vector store
+def parse_recipes():
     file = "./data/sample_recipes.csv"
     loader = CSVLoader(file_path=file)
     documents = loader.load()
+    return documents
 
-    # Initialize embedding model
+# Initialize embedding_model and create an in-memory vector store that contains the recipes
+def initialize_vector_store(documents):
     embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
-
-    # Create an in-memory vector store using embedding model
     vector_store = InMemoryVectorStore(embedding=embedding_model)
-
-    # Add recipes to the vector store
     vector_store.add_documents(documents)
+    return vector_store.as_retriever()
 
-    # Search for meals based on user input
-    retriever = vector_store.as_retriever()
-    relevant_recipes = retriever.invoke(input)
-
-    # Set up LLM
-    llm = ChatOpenAI(model="gpt-4o-mini")
-
-    # System message to request that the user's question be reformulated as a standalone question
-    # using the new question and any previous chat history that is relevant to the question
-    contextualize_system_prompt =  """Given a chat history and the latest user question
+# Create a chain that uses the chat history and the user's question to create a “standalone question”. 
+# This question is then passed into the retrieval step to fetch relevant documents (context). 
+def create_chat_history_aware_retriever(llm, vector_store_retriever):
+    rephrase_system_prompt =  """Given a chat history and the latest user question
     which might reference context in the chat history, formulate a standalone question
     which can be understood without the chat history. Do NOT answer the question,
     just reformulate it if needed and otherwise return it as is."""
 
-    # Create a prompt template containing the contextualize system message and conversation messages
-    contextualize_prompt = ChatPromptTemplate(
+    rephrase_prompt = ChatPromptTemplate(
         [
-            ("system", contextualize_system_prompt),
+            ("system", rephrase_system_prompt),
             MessagesPlaceholder("chat_history"),
             ("human", "{input}")
         ]
     )
 
-    # Construct a chain that accepts input and chat history
-    history_aware_retriever = create_history_aware_retriever(llm, retriever, contextualize_prompt)
+    return create_history_aware_retriever(llm, vector_store_retriever, rephrase_prompt)
 
-    # System message to indicate what task the LLM needs to perform and the context to use (relevant recipes retrieved from our list)
+# Create a chain that takes relevant documents (context), user question, and chat history to return a relevant response
+# The system prompt is also used to define the role of the llm and any specific instructions
+def create_qa_chain(llm):
     qa_system_prompt = """
         You are a a helpful meal planner. Your job is to suggest meals based on the user's input, chat history, and the context below. 
         If the user requests a meal type you're not familiar with, first obtain information about the meal type, then suggest meals.
@@ -66,7 +58,6 @@ def get_response(input, chat_history):
         {context}
     """
 
-    # Create a prompt template containing the Q&A system message and conversation messages
     qa_prompt = ChatPromptTemplate(
         [
             ("system", qa_system_prompt),
@@ -75,13 +66,9 @@ def get_response(input, chat_history):
         ]
     )
 
-    # Create a chain that uses relevant recipes (context) to answer questions
-    qa_chain = create_stuff_documents_chain(llm, qa_prompt)
+    return create_stuff_documents_chain(llm, qa_prompt) 
 
-    # Create a chain that applies the history retriever and Q&A chain in sequence retaining intermediate outputs such
-    # as the context
-    rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
-
+def get_response(rag_chain, input, chat_history):
     response = rag_chain.invoke(
         {
             "input": input,
@@ -95,15 +82,25 @@ def get_response(input, chat_history):
     return response["answer"]
   
 
-print("I'm the meal planner chatbot. How can I help you today?")
+# Load API keys from .env
+env_found = load_dotenv(override=True, verbose=True)
 
+llm = initialize_llm()
+documents = parse_recipes()
+vector_store_retriever = initialize_vector_store(documents)
+history_aware_retriever = create_chat_history_aware_retriever(llm, vector_store_retriever)
+qa_chain =  create_qa_chain(llm)
+# Create a chain that applies the history aware retriever and Q&A chains in sequence, retaining intermediate outputs such
+# as the context
+rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
 chat_history = []
+
+print("I'm the meal planner chatbot. How can I help you today?")
 
 while True:
     user_input = input ("You: ")
-    if user_input.lower() == "exit":
+    if user_input.lower() in ("exit", "quit"):
         break
-    response = get_response(user_input, chat_history)
+    response = get_response(rag_chain, user_input, chat_history)
+    print(chat_history)
     print(f"AI: {response}")
-
-
