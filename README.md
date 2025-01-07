@@ -76,3 +76,22 @@ Type `exit`
 * Select the 'default' project
 * Click on a run to see more details including input, documents retrieved, and output
 
+# Resources
+* [Recipe dataset](https://www.kaggle.com/datasets/paultimothymooney/recipenlg/data)
+* [OpenAI Models](https://platform.openai.com/docs/models) - details of models available and their cost
+* [Build a simple LLM application](https://python.langchain.com/docs/tutorials/llm_chain/) - intro tutorial on using language models and prompt templates
+* [Using a CSV Loader](https://python.langchain.com/docs/integrations/document_loaders/csv/)
+* [Vector Stores Overview](https://python.langchain.com/docs/concepts/vectorstores/)
+* [OpenAI Embeddings](https://python.langchain.com/docs/integrations/text_embedding/openai/) - uses in-memory vector store and shows the calls made by the vector store and retrievers under the hood to generate embeddings
+* [Using langchain-postgres](https://github.com/langchain-ai/langchain-postgres/blob/main/examples/vectorstore.ipynb) - how to connect to PGVector store, add documents with content and metadata, and do a similarity search
+* [Chat history](https://python.langchain.com/docs/versions/migrating_chains/conversation_retrieval_chain/#lcel) - create a rag chain that incorporates chat history
+* Langchain docs
+    * [ChatPromptTemplate](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html#chatprompttemplate)
+    * [CSVLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.csv_loader.CSVLoader.html)
+    * [PGVector](https://python.langchain.com/api_reference/postgres/vectorstores/langchain_postgres.vectorstores.PGVector.html#pgvector)
+
+
+# Further reading
+* [Build a Chatbot](https://python.langchain.com/docs/tutorials/chatbot/) - tutorial using LangGraph, which is not required to build a RAG application, but can simplify more complex applications.
+* [Build a Retrieval Augmented Generation (RAG) App](https://python.langchain.com/docs/tutorials/rag/) - tutorial using LangGraph. Shows how to use a text splitter for handling long documents. 
+
