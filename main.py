@@ -1,7 +1,9 @@
+import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_community.document_loaders import CSVLoader
-from langchain_core.vectorstores import InMemoryVectorStore
+from langchain_postgres import PGVector
+from langchain_postgres.vectorstores import PGVector
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -13,17 +15,34 @@ def initialize_llm():
     return ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 
 # Parse CSV file with recipes into a list of documents that can be loaded into a vector store
-def parse_recipes():
+# Content columns will be included when calculating embeddings
+def load_recipes():
     file = "./data/sample_recipes.csv"
-    loader = CSVLoader(file_path=file)
+    loader = CSVLoader(
+        file_path=file,
+        content_columns=["description"],
+        metadata_columns=["id", "name", "url"],
+        source_column="url"
+    )
     documents = loader.load()
     return documents
 
-# Initialize embedding_model and create an in-memory vector store that contains the recipes
+# Initialize embedding model and create a vector store in pgvector that contains the recipes
 def initialize_vector_store(documents):
     embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
-    vector_store = InMemoryVectorStore(embedding=embedding_model)
-    vector_store.add_documents(documents)
+    db_url = os.environ["DB_URL"]
+    collection_name = "recipes"
+
+    vector_store = PGVector(
+        embeddings=embedding_model,
+        collection_name=collection_name,
+        connection=db_url,
+        use_jsonb=True
+    )
+
+    # Adding documents by ID will overwrite any existing documents with the same ID during startup
+    vector_store.add_documents(documents=documents, ids=[doc.metadata["id"] for doc in documents])
+
     return vector_store.as_retriever()
 
 # Create a chain that uses the chat history and the user's question to create a “standalone question”. 
@@ -86,17 +105,20 @@ def get_response(rag_chain, input, chat_history):
 env_found = load_dotenv(override=True, verbose=True)
 
 llm = initialize_llm()
-documents = parse_recipes()
+
+documents = load_recipes()
 vector_store_retriever = initialize_vector_store(documents)
+
 history_aware_retriever = create_chat_history_aware_retriever(llm, vector_store_retriever)
 qa_chain =  create_qa_chain(llm)
+
 # Create a chain that applies the history aware retriever and Q&A chains in sequence, retaining intermediate outputs such
 # as the context
 rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
-chat_history = []
 
 print("I'm the meal planner chatbot. How can I help you today?")
 
+chat_history = []
 while True:
     user_input = input ("You: ")
     if user_input.lower() in ("exit", "quit"):

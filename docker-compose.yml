@@ -1,16 +1,14 @@
 services:
   db:
-    image: ankane/pgvector
+    image: pgvector/pgvector:pg17
     container_name: pgvector
     restart: always
     ports:
-      - "5434:5432"
+      - "5440:5432"
     environment:  
-      - POSTGRES_DB=meal_planner
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=codemash2025
-    volumes:
-     - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - POSTGRES_DB=meal_planner
 
   pgadmin-compose:
     image: dpage/pgadmin4

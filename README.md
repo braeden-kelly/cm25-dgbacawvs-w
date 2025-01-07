@@ -1,6 +1,7 @@
 ## Requirements
-* Python 3
+* Python 3 (consider installing with python virtual environment like pyenv)
 * Python IDE of your choice (Visual Studio Code, PyCharm, etc.)
+* Docker
 * OpenAI API key
 * Langchain API key (to use LangSmith for debugging)
 
@@ -36,7 +37,11 @@ Follow installation instructions on pip's website (https://pip.pypa.io/en/stable
 ## Install packages
 `python3 -m pip install -r requirements.txt`
 
-## Start dependencies (postgres, pgadmin, etc.)
+## Start dependencies (postgres, pgadmin, etc.) in Docker
+Get the docker image for postgres
+`docker pull pgvector/pgvector:pg17`
+
+To start containers:
 `docker-compose up -d`
 
 To stop and remove containers:
@@ -52,12 +57,22 @@ To stop and remove containers:
     * Name: pgvector
 * Connection tab
     * Hostname: host.docker.internal
-    * Port: 5434
+    * Port: 5440
     * Username: postgres
     * Password: codemash2025!
+
+After starting the application the following two tables will be created in the meal_planner database:
+`select * from langchain_pg_collection;`
+`select * from langchain_pg_embedding;`
 
 ## Run application
 `python3 main.py`
 
 ## Exit application
 Type `exit`
+
+## Review calls to LLM using Langsmith
+* Go to https://smith.langchain.com/ and login with your langchain account
+* Select the 'default' project
+* Click on a run to see more details including input, documents retrieved, and output
+

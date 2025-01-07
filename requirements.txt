@@ -2,5 +2,6 @@ python-dotenv
 langchain
 langchain-community
 langchain-openai
+psycopg[binary]
+langchain-postgres
 langsmith
-docarray
