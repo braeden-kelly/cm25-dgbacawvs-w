@@ -17,12 +17,12 @@ def initialize_llm():
 # Parse CSV file with recipes into a list of documents that can be loaded into a vector store
 # Content columns will be included when calculating embeddings
 def load_recipes():
-    file = "./data/sample_recipes.csv"
+    file = "./data/sample_recipes_v2.csv"
     loader = CSVLoader(
         file_path=file,
-        content_columns=["description"],
-        metadata_columns=["id", "name", "url"],
-        source_column="url"
+        content_columns=["details"],
+        metadata_columns=["id", "name", "link"],
+        source_column="link"
     )
     documents = loader.load()
     return documents
@@ -48,10 +48,10 @@ def initialize_vector_store(documents):
 # Create a chain that uses the chat history and the user's question to create a “standalone question”. 
 # This question is then passed into the retrieval step to fetch relevant documents (context). 
 def create_chat_history_aware_retriever(llm, vector_store_retriever):
-    rephrase_system_prompt =  """Given a chat history and the latest user question
-    which might reference context in the chat history, formulate a standalone question
-    which can be understood without the chat history. Do NOT answer the question,
-    just reformulate it if needed and otherwise return it as is."""
+    rephrase_system_prompt =  """
+    Given a chat history and the latest user question which might reference context in the chat history, 
+    formulate a standalone question which can be understood without the chat history. 
+    Do NOT answer the question,just reformulate it if needed and otherwise return it as is."""
 
     rephrase_prompt = ChatPromptTemplate(
         [
@@ -67,13 +67,28 @@ def create_chat_history_aware_retriever(llm, vector_store_retriever):
 # The system prompt is also used to define the role of the llm and any specific instructions
 def create_qa_chain(llm):
     qa_system_prompt = """
-        You are a a helpful meal planner. Your job is to suggest meals based on the user's input, chat history, and the context below. 
-        If the user requests a meal type you're not familiar with, first obtain information about the meal type, then suggest meals.
+        You are a a helpful cheery meal planner. Your job is to suggest meals based on the user's request and 
+        the master recipe list (also called master list), which is provided in the
+        context below.
 
-        Respond only with recipes included in the context; do not add recipes from other sources.
+        Follow these steps before recommending meals:
+        1. If the user requests a meal type you're not familiar with, obtain information 
+        about the meal type before suggesting meals.
+        2. Obtain recipes from the master list that meet the user's request
+        3. If no recipes are found or the number of recipes found doesn't satisfy the user's request, look for new recipes 
+        on the Internet that match the user's request. DO NOT ask the user whether they want recipes from the Internet, just complete the task.
+        4. Return a list of recipes selected in JSON with the following information for each recipe:
         
-        If the user's question has nothing to do with recipes, meals, or food, then reply 'Sorry, I don't have the information requested.'
+        "recipe_name": <recipe name>
+        "description": <one sentence describing the recipe>
+        "source": <'Master list' or 'Internet' depending on where the recipe came from>
+        "ingredients": <list of ingredients>
+        "directions": <list of steps needed to make recipe>
+        "link": <Link to recipe's webpage. Do not make up a website for new recipes, include the link to the website you obtained the recipe from.>
         
+    If no recipes were found, then reply 'No matching recipes were found'. 
+    If the user's request is not relevant to a meal planner say 'Sorry, I don't have the information requested.'
+
         {context}
     """
 
@@ -124,5 +139,4 @@ while True:
     if user_input.lower() in ("exit", "quit"):
         break
     response = get_response(rag_chain, user_input, chat_history)
-    print(chat_history)
     print(f"AI: {response}")
