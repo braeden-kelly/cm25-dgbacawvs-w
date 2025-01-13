@@ -4,14 +4,19 @@
 * Docker
 * OpenAI API key
 * Langchain API key (to use LangSmith for debugging)
+* If you're using Windows, install Git Bash so that you can run the commands below 
+(if using VSCode you can select Git Bash after starting the integrated terminal)
 
 ## Setup environment variables
 Copy the file 'sample.env' and rename it to '.env'.  Add your API keys.
 
+## Python command
+You might need to use `python3` instead of `python` in the commands below, if you have more than one version of python installed.
+
 ## Create and activate a virtual environment
 Create a virtual environment to install dependencies only in this project and not globally
 
-`python3 -m venv .venv`
+`python -m venv .venv`
 
 To activate the virtual environment:
 
@@ -25,17 +30,17 @@ To verify virtual environment has been activated:
 
 If you're running Python 3.4+ you should already have pip installed. To check if you have pip:
 
-`python3 -m pip --version`
+`python -m pip --version`
 
 ### Install pip:
 
 Follow installation instructions on pip's website (https://pip.pypa.io/en/stable/installation/#installation)
 
 ### Upgrade pip:
-`python3 -m pip install --upgrade pip`
+`python -m pip install --upgrade pip`
 
 ## Install packages
-`python3 -m pip install -r requirements.txt`
+`python -m pip install -r requirements.txt`
 
 ## Start dependencies (postgres, pgadmin, etc.) in Docker
 Get the docker image for postgres
@@ -59,14 +64,14 @@ To stop and remove containers:
     * Hostname: host.docker.internal
     * Port: 5440
     * Username: postgres
-    * Password: codemash2025!
+    * Password: codemash2025
 
 After starting the application the following two tables will be created in the meal_planner database:
 `select * from langchain_pg_collection;`
 `select * from langchain_pg_embedding;`
 
 ## Run application
-`python3 main.py`
+`python main.py`
 
 ## Exit application
 Type `exit`
