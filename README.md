@@ -4,7 +4,7 @@
 * Docker
 * OpenAI API key
 * Langchain API key (to use LangSmith for debugging)
-* If you're using Windows, install Git Bash so that you can run the commands below 
+* If you're using **Windows**, install Git Bash so that you can run the commands below 
 (if using VSCode you can select Git Bash after starting the integrated terminal)
 
 ## Setup environment variables
@@ -20,7 +20,14 @@ Create a virtual environment to install dependencies only in this project and no
 
 To activate the virtual environment:
 
+**Mac:**
+
 `source .venv/bin/activate`
+
+**Windows:**
+
+`source .venv/Scripts/activate`  
+
 
 To verify virtual environment has been activated:
 
