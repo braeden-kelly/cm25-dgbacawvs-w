@@ -49,7 +49,11 @@ Follow installation instructions on pip's website (https://pip.pypa.io/en/stable
 ## Install packages
 `python -m pip install -r requirements.txt`
 
+If you run into this error on Windows: "Failed to activate vs environment: could not parse vswhere.exe output", you might be missing a C++ compiler needed to run postgres-langchain. Install Visual Studio Build Tools 2022 and try again.
+
 ## Start dependencies (postgres, pgadmin, etc.) in Docker
+Open Docker Desktop to start running the Docker engine, then:
+
 Get the docker image for postgres
 `docker pull pgvector/pgvector:pg17`
 
