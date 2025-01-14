@@ -92,6 +92,7 @@ Type `exit`
 * [Recipe dataset](https://www.kaggle.com/datasets/paultimothymooney/recipenlg/data)
 * [OpenAI Models](https://platform.openai.com/docs/models) - details of models available and their cost
 * [Build a simple LLM application](https://python.langchain.com/docs/tutorials/llm_chain/) - intro tutorial on using language models and prompt templates
+* [Best practices for prompt engineering with the OpenAI API](https://help.openai.com/en/articles/6654000-best-practices-for-prompt-engineering-with-the-openai-api)
 * [Using a CSV Loader](https://python.langchain.com/docs/integrations/document_loaders/csv/)
 * [Vector Stores Overview](https://python.langchain.com/docs/concepts/vectorstores/)
 * [OpenAI Embeddings](https://python.langchain.com/docs/integrations/text_embedding/openai/) - uses in-memory vector store and shows the calls made by the vector store and retrievers under the hood to generate embeddings
