@@ -77,12 +77,14 @@ To stop and remove containers:
     * Username: postgres
     * Password: codemash2025
 
-After starting the application the following two tables will be created in the meal_planner database:
+After starting the application the following two tables are created by Langchain in the meal_planner database:
 `select * from langchain_pg_collection;`
 `select * from langchain_pg_embedding;`
 
 ## Run application
 `python main.py`
+
+If you would like some ideas of questions to ask the chatbot, refer to [User Prompt Examples](USER_PROMPT_EXAMPLES.md)
 
 ## Exit application
 Type `exit`
